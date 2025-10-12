@@ -1,6 +1,6 @@
 import { authCookieKey, authRefreshCookieKey, CreatorSignupInput, FetchMethods, LoginInput, SignupInput } from '@/lib/constants';
 import { configService } from '@/util/config';
-import { setCookie } from 'cookies-next';
+import { OptionsType, setCookie } from 'cookies-next';
 
 export const fetchRequest = async (input: { init: RequestInit; fetchMethod: FetchMethods; pathName: string }) => {
   const { init, fetchMethod, pathName } = input;
@@ -18,6 +18,15 @@ export const fetchRequest = async (input: { init: RequestInit; fetchMethod: Fetc
 };
 
 const useAPI = () => {
+  const setAuthCookie = (key: string, data: any, options: OptionsType) => {
+    setCookie(key, data, {
+      ...options,
+      path: '/',
+      domain: configService.NEXT_PUBLIC_APP_DOMAINS,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    });
+  };
+
   const login = async (input: LoginInput) => {
     const data = await fetchRequest({
       fetchMethod: FetchMethods.POST,
@@ -30,8 +39,8 @@ const useAPI = () => {
       }
     });
 
-    setCookie(authCookieKey, data.accessToken, { domain: configService.NEXT_PUBLIC_APP_DOMAINS });
-    setCookie(authRefreshCookieKey, data.refreshToken, { domain: configService.NEXT_PUBLIC_APP_DOMAINS });
+    setAuthCookie(authCookieKey, data.accessToken, {});
+    setAuthCookie(authRefreshCookieKey, data.refreshToken, {});
     return data;
   };
 
@@ -46,8 +55,8 @@ const useAPI = () => {
         }
       }
     });
-    setCookie(authCookieKey, data.accessToken, { domain: configService.NEXT_PUBLIC_APP_DOMAINS });
-    setCookie(authRefreshCookieKey, data.refreshToken, { domain: configService.NEXT_PUBLIC_APP_DOMAINS });
+    setAuthCookie(authCookieKey, data.accessToken, {});
+    setAuthCookie(authRefreshCookieKey, data.refreshToken, {});
     return data;
   };
 
@@ -62,8 +71,8 @@ const useAPI = () => {
         }
       }
     });
-    setCookie(authCookieKey, data.accessToken, { domain: configService.NEXT_PUBLIC_APP_DOMAINS });
-    setCookie(authRefreshCookieKey, data.refreshToken, { domain: configService.NEXT_PUBLIC_APP_DOMAINS });
+    setAuthCookie(authCookieKey, data.accessToken, {});
+    setAuthCookie(authRefreshCookieKey, data.refreshToken, {});
     return data;
   };
 
