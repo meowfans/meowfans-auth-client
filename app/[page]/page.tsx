@@ -51,6 +51,7 @@ export default function Auth() {
 
       switch (role) {
         case UserRoles.ADMIN:
+          console.log({ role, adminAppUrl });
           return router.push(adminAppUrl);
         case UserRoles.CREATOR:
           return router.push(creatorAppUrl);
