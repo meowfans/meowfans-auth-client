@@ -8,35 +8,41 @@ import { Theme } from '@radix-ui/themes';
 import type { Metadata, Viewport } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Inter } from 'next/font/google';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
-export const metadata = {
-  metadataBase: new URL(AppConfig.siteUrl),
-  title: {
-    template: AppConfig.template,
-    default: AppConfig.title
-  },
-  alternates: {
-    canonical: AppConfig.canonical
-  },
-  manifest: AppConfig.manifest,
-  applicationName: AppConfig.applicationName,
-  description: AppConfig.description,
-  openGraph: {
-    siteName: AppConfig.site_name,
-    title: AppConfig.title,
+export async function generateMetadata() {
+  const headersList = headers();
+  const pathname = (await headersList).get('x-pathname');
+
+  const metadata = {
+    metadataBase: new URL(AppConfig.siteUrl),
+    title: {
+      template: AppConfig.template,
+      default: `${AppConfig.title} | ${pathname?.substring(1)}`
+    },
+    alternates: {
+      canonical: AppConfig.canonical
+    },
+    manifest: AppConfig.manifest,
+    applicationName: AppConfig.applicationName,
     description: AppConfig.description,
-    type: AppConfig.type as 'website',
-    locale: AppConfig.locale,
-    url: AppConfig.siteUrl
-  },
-  generator: 'Next.js',
-  keywords: AppConfig.keywords,
-  icons: AppConfig.icons
-} satisfies Metadata;
+    openGraph: {
+      siteName: AppConfig.site_name,
+      title: AppConfig.title,
+      description: AppConfig.description,
+      type: AppConfig.type as 'website',
+      locale: AppConfig.locale,
+      url: AppConfig.siteUrl
+    },
+    generator: 'Next.js',
+    keywords: AppConfig.keywords,
+    icons: AppConfig.icons
+  } satisfies Metadata;
+  return metadata;
+}
 
 const inter = Inter({
   subsets: ['latin'],
@@ -78,7 +84,7 @@ export const redirectToApp = async (jwtUser: JwtUser) => {
     case UserRoles.CREATOR:
       return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_CREATOR_URL, pathname: '/profile' }));
     case UserRoles.FAN:
-      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_FAN_URL, pathname: '/home' }));
+      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_FAN_URL, pathname: '/dashboard' }));
   }
 };
 
@@ -91,9 +97,10 @@ export default async function RootLayout({ children }: Props) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="generator" content={metadata.generator} />
-        <meta name="description" content={metadata.description} />
-        <meta name="keywords" content={metadata.keywords.join(', ')} />
+        <meta name="rating" content="adult" />
+        <meta name="robots" content="index, follow" />
+        <meta name="classification" content="Adult" />
+        <meta name="rating" content="RTA-5042-1996-1400-1577-RTA" />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/icons/app_icon_20x20.svg" />
         {AppConfig.icons.map(({ rel, url }, idx) => (
