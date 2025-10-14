@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +13,7 @@ import { Header } from './Header';
 interface Props {
   handleLogin: (e: FormEvent<HTMLFormElement>, input: LoginInput) => unknown;
   loading: boolean;
+  error?: string;
 }
 
 const emptyInput = {
@@ -18,70 +21,81 @@ const emptyInput = {
   password: ''
 };
 
-const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
+const LoginForm: React.FC<Props> = ({ handleLogin, loading, error }) => {
   const [input, setInput] = useState<LoginInput>(emptyInput);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [initialInput, setInitialInput] = useState<LoginInput>(emptyInput);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const handleChangeInput = ({ key, value }: { key: keyof LoginInput; value: string }) => {
     setInitialInput((prev) => ({ ...prev, [key]: value }));
     setInput((prev) => ({ ...prev, [key]: value.trim() }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
   useEffect(() => {
-    setDisabled(
-      !initialInput.email || !initialInput.password || !isValidEmail(initialInput.email) || !isValidPassword(initialInput.password)
-    );
-  }, [initialInput.email, initialInput.password]);
+    setDisabled(!isValidEmail(input.email) || !isValidPassword(input.password));
+  }, [input]);
+
+  const validate = (): boolean => {
+    const newErrors: typeof errors = {};
+    if (!isValidEmail(input.email)) newErrors.email = 'Invalid email format';
+    if (!isValidPassword(input.password)) newErrors.password = 'Password must be at least 6 characters';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   return (
-    <form className="p-6 md:p-8" onSubmit={(e) => handleLogin(e, input)}>
-      <div className="flex flex-col gap-6">
-        <Header />
-        <div className="grid gap-3">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="m@example.com"
-            required
-            autoComplete="email"
-            value={initialInput.email}
-            onChange={(e) => handleChangeInput({ key: 'email', value: e.target.value })}
-          />
-        </div>
-        <div className="grid gap-3">
-          <div className="flex items-center">
-            <Label htmlFor="password">Password</Label>
-            {/* TODO: IMPLEMENT FORGOT-PASSWORD AFTER EMAIL CONFIGURATION */}
-            <Link href="/forgot-password" className="ml-auto text-sm underline-offset-2 hover:underline hidden">
-              Forgot your password?
-            </Link>
-          </div>
-          <Input
-            id="password"
-            type="password"
-            placeholder="******"
-            required
-            autoComplete="password"
-            value={initialInput.password}
-            onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
-          />
-        </div>
-        <Button disabled={disabled} type="submit" className="w-full">
-          {loading && <Loader2Icon className="animate-spin" />}
-          Login
-        </Button>
-        {/* TODO: IMPLEMENT OAUTH LOGIN AFTER EMAIL CONFIGURATION */}
-        {/* <OtherLogin /> */}
-        <div className="text-center text-sm flex flex-col">
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="underline underline-offset-4">
-            Sign up
-          </Link>
-        </div>
+    <form
+      className="p-6 md:p-8 flex flex-col gap-6"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (validate()) handleLogin(e, input);
+      }}
+    >
+      <Header />
+
+      <div className="grid gap-3">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="m@example.com"
+          value={initialInput.email}
+          onChange={(e) => handleChangeInput({ key: 'email', value: e.target.value })}
+          className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+        />
+        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+      </div>
+
+      <div className="grid gap-3">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="******"
+          value={initialInput.password}
+          onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
+          className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
+        />
+        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+      </div>
+
+      {error && <p className="text-sm text-center text-red-500">{error}</p>}
+
+      <Button disabled={disabled || loading} type="submit" className="w-full">
+        {loading && <Loader2Icon className="animate-spin mr-2" />}
+        Login
+      </Button>
+
+      <div className="text-center text-sm">
+        Don’t have an account?{' '}
+        <Link href="/signup" className="underline underline-offset-4">
+          Sign up
+        </Link>
       </div>
     </form>
   );
 };
+
 export default LoginForm;

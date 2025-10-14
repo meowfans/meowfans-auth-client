@@ -21,6 +21,16 @@ export enum FetchMethods {
   GET = 'GET'
 }
 
+export enum AuthErrors {
+  EMAIL_EXISTS = 'Email already exists. Please use another email.',
+  INVALID_CREDENTIALS = 'Invalid email or password.',
+  USER_NOT_FOUND = 'No user found with this email.',
+  OFFLINE = 'You are offline. Please check your internet connection.',
+  CREATOR_SIGNUP_FAILED = 'Unable to create creator account. Try again later.',
+  FAN_SIGNUP_FAILED = 'Unable to create fan account. Try again later.',
+  ADMIN_SIGNUP_FAILED = 'Unauthorized admin signup attempt.'
+}
+
 export const authCookieKey = '_accessToken';
 export const authRefreshCookieKey = '_refreshToken';
 

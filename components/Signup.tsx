@@ -14,6 +14,7 @@ import { Header } from './Header';
 interface Props {
   handleSignup: (e: FormEvent<HTMLFormElement>, input: SignupInput) => unknown;
   loading: boolean;
+  error?: string;
 }
 
 const emptyInput: SignupInput = {
@@ -22,102 +23,108 @@ const emptyInput: SignupInput = {
   password: ''
 };
 
-const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
+const SignupForm: React.FC<Props> = ({ handleSignup, loading, error }) => {
   const [input, setInput] = useState<SignupInput>(emptyInput);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
   const [initialInput, setInitialInput] = useState<SignupInput>(emptyInput);
+  const [errors, setErrors] = useState<Partial<Record<keyof SignupInput, string>>>({});
 
   const handleChangeInput = ({ key, value }: { key: keyof SignupInput; value: string }) => {
     setInitialInput((prev) => ({ ...prev, [key]: value }));
     setInput((prev) => ({ ...prev, [key]: value.trim() }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
   useEffect(() => {
-    setDisabled(!input.email || !input.password || !input.fullName || !isValidEmail(input.email) || !isValidPassword(input.password));
-  }, [input.email, input.password, input.fullName]);
+    setDisabled(!input.fullName || !input.email || !input.password || !isValidEmail(input.email) || !isValidPassword(input.password));
+  }, [input]);
+
+  const validate = (): boolean => {
+    const newErrors: Partial<Record<keyof SignupInput, string>> = {};
+    if (!input.fullName) newErrors.fullName = 'Full name is required';
+    if (!isValidEmail(input.email)) newErrors.email = 'Invalid email format';
+    if (!isValidPassword(input.password)) newErrors.password = 'Password must be at least 6 characters';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   return (
-    <form className="p-6 md:p-8 flex flex-col" onSubmit={(e) => handleSignup(e, input)}>
-      <div className="flex flex-col gap-6">
-        <Header />
+    <form
+      className="p-6 md:p-8 flex flex-col"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (validate()) handleSignup(e, input);
+      }}
+    >
+      <Header />
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v)}>
-          <TabsList>
-            <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="password">Password</TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v)}>
+        <TabsList>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="password">Password</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="account" className="space-y-1">
-            <div className="grid gap-3">
-              <Label htmlFor="tabs-demo-fullname">Full name</Label>
-              <Input
-                id="tabs-demo-fullname"
-                placeholder="Meow User"
-                type="text"
-                value={initialInput.fullName}
-                onChange={(e) =>
-                  handleChangeInput({
-                    key: 'fullName',
-                    value: e.target.value
-                  })
-                }
-              />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="tabs-demo-email">Email</Label>
-              <Input
-                id="tabs-demo-email"
-                placeholder="meow@gmail.com"
-                type="email"
-                value={initialInput.email}
-                onChange={(e) =>
-                  handleChangeInput({
-                    key: 'email',
-                    value: e.target.value
-                  })
-                }
-              />
-            </div>
-            <Button type="button" className="w-full" onClick={() => setActiveTab('password')}>
-              Next
-            </Button>
-          </TabsContent>
+        <TabsContent value="account" className="space-y-4">
+          <div className="grid gap-3">
+            <Label htmlFor="fullName">Full name</Label>
+            <Input
+              id="fullName"
+              type="text"
+              placeholder="Meow User"
+              value={initialInput.fullName}
+              onChange={(e) => handleChangeInput({ key: 'fullName', value: e.target.value })}
+              className={errors.fullName ? 'border-red-500 focus-visible:ring-red-500' : ''}
+            />
+            {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
+          </div>
 
-          <TabsContent value="password" className="space-y-1">
-            <div className="grid gap-3">
-              <Label htmlFor="tabs-demo-password">Password</Label>
-              <Input
-                id="tabs-demo-password"
-                type="password"
-                required
-                placeholder="password"
-                autoComplete="password"
-                value={initialInput.password}
-                onChange={(e) =>
-                  handleChangeInput({
-                    key: 'password',
-                    value: e.target.value
-                  })
-                }
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={disabled}>
-              {loading && <Loader2Icon className="animate-spin" />}
-              Signup
-            </Button>
-          </TabsContent>
-        </Tabs>
+          <div className="grid gap-3">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="meow@gmail.com"
+              value={initialInput.email}
+              onChange={(e) => handleChangeInput({ key: 'email', value: e.target.value })}
+              className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+            />
+            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+          </div>
 
-        {/* TODO: IMPLEMENT OAUTH LOGIN AFTER EMAIL CONFIGURATION */}
-        {/* <OtherLogin /> */}
+          <Button type="button" className="w-full" onClick={() => setActiveTab('password')}>
+            Next
+          </Button>
+        </TabsContent>
 
-        <div className="text-center text-sm flex flex-col">
-          Already have an account?{' '}
-          <Link href="/login" className="underline underline-offset-4">
-            Login
-          </Link>
-        </div>
+        <TabsContent value="password" className="space-y-3">
+          <div className="grid gap-3">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="password"
+              value={initialInput.password}
+              onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
+              className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
+            />
+            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+          </div>
+
+          {error && <p className="text-sm text-center text-red-500">{error}</p>}
+
+          <Button type="submit" className="w-full" disabled={disabled || loading}>
+            {loading && <Loader2Icon className="animate-spin mr-2" />}
+            Signup
+          </Button>
+        </TabsContent>
+      </Tabs>
+
+      <div className="text-center text-sm">
+        Already have an account?{' '}
+        <Link href="/login" className="underline underline-offset-4">
+          Login
+        </Link>
       </div>
     </form>
   );

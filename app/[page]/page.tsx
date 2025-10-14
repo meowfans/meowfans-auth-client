@@ -23,6 +23,7 @@ export default function Auth() {
   const { login, signup, creatorSignup } = useAPI();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>, input: LoginInput) => {
     e.preventDefault();
@@ -32,7 +33,7 @@ export default function Auth() {
     try {
       const { roles } = await login(input);
 
-      const role = roles[0] as UserRoles;
+      const role = roles?.at(0) as UserRoles;
 
       const creatorAppUrl = buildSafeUrl({
         host: configService.NEXT_PUBLIC_CREATOR_URL,
@@ -60,9 +61,9 @@ export default function Auth() {
       }
 
       toast.success('Logged in');
-      return router.push(fanAppUrl);
     } catch (error) {
-      toast.error('Something wrong happened!');
+      toast.error(error.message);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -83,7 +84,8 @@ export default function Auth() {
 
       return router.push(fanAppUrl);
     } catch (error) {
-      toast.error('Something wrong happened!');
+      toast.error(error.message);
+      setErrorMessage(error.message)
     } finally {
       setLoading(false);
     }
@@ -123,10 +125,10 @@ export default function Auth() {
                 {(() => {
                   switch (pathname) {
                     case AuthPaths.SIGNUP:
-                      return <Signup loading={loading} handleSignup={handleSignup} />;
+                      return <Signup loading={loading} handleSignup={handleSignup} error={errorMessage} />;
 
                     case AuthPaths.LOGIN:
-                      return <Login loading={loading} handleLogin={handleLogin} />;
+                      return <Login loading={loading} handleLogin={handleLogin} error={errorMessage} />;
 
                     case AuthPaths.FORGOT_PASSWORD:
                       return <ForgotPassword />;
