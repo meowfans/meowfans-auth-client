@@ -10,7 +10,6 @@ import { Loader2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { Header } from './Header';
-import OtherLogin from './OtherLogin';
 
 interface Props {
   handleSignup: (e: FormEvent<HTMLFormElement>, input: SignupInput) => unknown;
@@ -27,9 +26,11 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
   const [input, setInput] = useState<SignupInput>(emptyInput);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
+  const [initialInput, setInitialInput] = useState<SignupInput>(emptyInput);
 
-  const handleChange = ({ key, value }: { key: string; value: string }) => {
-    setInput({ ...input, [key]: value.trim() });
+  const handleChangeInput = ({ key, value }: { key: keyof SignupInput; value: string }) => {
+    setInitialInput((prev) => ({ ...prev, [key]: value }));
+    setInput((prev) => ({ ...prev, [key]: value.trim() }));
   };
 
   useEffect(() => {
@@ -54,9 +55,9 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
                 id="tabs-demo-fullname"
                 placeholder="Meow User"
                 type="text"
-                value={input.fullName}
+                value={initialInput.fullName}
                 onChange={(e) =>
-                  handleChange({
+                  handleChangeInput({
                     key: 'fullName',
                     value: e.target.value
                   })
@@ -69,9 +70,9 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
                 id="tabs-demo-email"
                 placeholder="meow@gmail.com"
                 type="email"
-                value={input.email}
+                value={initialInput.email}
                 onChange={(e) =>
-                  handleChange({
+                  handleChangeInput({
                     key: 'email',
                     value: e.target.value
                   })
@@ -92,9 +93,9 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
                 required
                 placeholder="password"
                 autoComplete="password"
-                value={input.password}
+                value={initialInput.password}
                 onChange={(e) =>
-                  handleChange({
+                  handleChangeInput({
                     key: 'password',
                     value: e.target.value
                   })
@@ -108,7 +109,8 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
           </TabsContent>
         </Tabs>
 
-        <OtherLogin />
+        {/* TODO: IMPLEMENT OAUTH LOGIN AFTER EMAIL CONFIGURATION */}
+        {/* <OtherLogin /> */}
 
         <div className="text-center text-sm flex flex-col">
           Already have an account?{' '}

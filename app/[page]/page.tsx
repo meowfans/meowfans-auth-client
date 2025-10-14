@@ -41,7 +41,7 @@ export default function Auth() {
 
       const fanAppUrl = buildSafeUrl({
         host: configService.NEXT_PUBLIC_FAN_URL,
-        pathname: '/home'
+        pathname: '/dashboard'
       });
 
       const adminAppUrl = buildSafeUrl({
@@ -78,7 +78,7 @@ export default function Auth() {
 
       const fanAppUrl = buildSafeUrl({
         host: configService.NEXT_PUBLIC_FAN_URL,
-        pathname: '/analytics'
+        pathname: '/dashboard'
       });
 
       return router.push(fanAppUrl);
