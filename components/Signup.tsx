@@ -14,7 +14,6 @@ import { Header } from './Header';
 interface Props {
   handleSignup: (e: FormEvent<HTMLFormElement>, input: SignupInput) => unknown;
   loading: boolean;
-  error?: string;
 }
 
 const emptyInput: SignupInput = {
@@ -23,7 +22,7 @@ const emptyInput: SignupInput = {
   password: ''
 };
 
-const SignupForm: React.FC<Props> = ({ handleSignup, loading, error }) => {
+const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
   const [input, setInput] = useState<SignupInput>(emptyInput);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
@@ -110,8 +109,6 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading, error }) => {
             />
             {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
           </div>
-
-          {error && <p className="text-sm text-center text-red-500">{error}</p>}
 
           <Button type="submit" className="w-full" disabled={disabled || loading}>
             {loading && <Loader2Icon className="animate-spin mr-2" />}

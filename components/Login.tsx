@@ -7,13 +7,12 @@ import { LoginInput } from '@/lib/constants';
 import { isValidEmail, isValidPassword } from '@/util/helpers';
 import { Loader2Icon } from 'lucide-react';
 import Link from 'next/link';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Header } from './Header';
 
 interface Props {
   handleLogin: (e: FormEvent<HTMLFormElement>, input: LoginInput) => unknown;
   loading: boolean;
-  error?: string;
 }
 
 const emptyInput = {
@@ -21,7 +20,7 @@ const emptyInput = {
   password: ''
 };
 
-const LoginForm: React.FC<Props> = ({ handleLogin, loading, error }) => {
+const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
   const [input, setInput] = useState<LoginInput>(emptyInput);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [initialInput, setInitialInput] = useState<LoginInput>(emptyInput);
@@ -33,9 +32,9 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading, error }) => {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  useEffect(() => {
-    setDisabled(!isValidEmail(input.email) || !isValidPassword(input.password));
-  }, [input]);
+  // useEffect(() => {
+  //   setDisabled(!isValidEmail(input.email) || !isValidPassword(input.password));
+  // }, [input]);
 
   const validate = (): boolean => {
     const newErrors: typeof errors = {};
@@ -81,9 +80,7 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading, error }) => {
         {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
       </div>
 
-      {error && <p className="text-sm text-center text-red-500">{error}</p>}
-
-      <Button disabled={disabled || loading} type="submit" className="w-full">
+      <Button disabled={disabled || loading} type="submit" className="w-full z-50">
         {loading && <Loader2Icon className="animate-spin mr-2" />}
         Login
       </Button>

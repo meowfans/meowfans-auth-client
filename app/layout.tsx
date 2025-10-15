@@ -10,7 +10,7 @@ import { ThemeProvider } from 'next-themes';
 import { Inter } from 'next/font/google';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 export async function generateMetadata() {
@@ -84,7 +84,7 @@ export const redirectToApp = async (jwtUser: JwtUser) => {
     case UserRoles.CREATOR:
       return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_CREATOR_URL, pathname: '/profile' }));
     case UserRoles.FAN:
-      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_FAN_URL, pathname: '/dashboard' }));
+      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_FAN_URL, pathname: '/newest' }));
   }
 };
 
@@ -108,26 +108,7 @@ export default async function RootLayout({ children }: Props) {
         ))}
       </head>
       <body className={cn(inter.variable, 'overscroll-none')}>
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          gutter={8}
-          containerClassName="toaster-wrapper"
-          containerStyle={{}}
-          toastOptions={{
-            className: 'single-toaster',
-            duration: 5000,
-            removeDelay: 1000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-              padding: '5px 5px',
-              fontSize: '14px'
-            },
-            success: { style: { background: '#000', color: '#fff' } },
-            error: { style: { background: '#b33234', color: '#fff' } }
-          }}
-        />
+        <Toaster position="top-center" richColors />
         <Theme>
           <ThemeProvider
             attribute="class"

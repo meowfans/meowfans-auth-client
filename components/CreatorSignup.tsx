@@ -106,7 +106,7 @@ const CreatorSignup: React.FC<Props> = ({ handleCreatorSignUp, loading }) => {
                 onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
               />
             </div>
-            <Button type="submit" className="w-full mt-7" disabled={isDisabled}>
+            <Button type="submit" className="w-full z-50" disabled={isDisabled}>
               Signup
             </Button>
           </TabsContent>

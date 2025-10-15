@@ -22,7 +22,7 @@ const ForgotPassword = () => {
             <Input id="password-otp" type="text" placeholder="xxxxxx" required />
           </div>
         )}
-        <Button type="submit" className="w-full" onClick={() => setHasSend(true)}>
+        <Button type="submit" className="w-full z-50" onClick={() => setHasSend(true)}>
           Send
         </Button>
       </div>

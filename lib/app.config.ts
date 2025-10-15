@@ -2,7 +2,7 @@
 export const AppConfig = {
   applicationName: 'MeowFans',
   title: 'Auth',
-  description: 'Become a meow member',
+  description: 'Become a meowfans member',
   keywords: ['MeowFans'],
   siteUrl: "https://auth.meowfans.app",
   canonical: "https://auth.meowfans.app",

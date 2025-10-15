@@ -10,7 +10,7 @@ import { buildSafeUrl } from '@/util/helpers';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const Login = dynamic(() => import('@/components/Login'), { ssr: false });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
@@ -23,7 +23,6 @@ export default function Auth() {
   const { login, signup, creatorSignup } = useAPI();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>, input: LoginInput) => {
     e.preventDefault();
@@ -63,7 +62,6 @@ export default function Auth() {
       toast.success('Logged in');
     } catch (error) {
       toast.error(error.message);
-      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -85,7 +83,6 @@ export default function Auth() {
       return router.push(fanAppUrl);
     } catch (error) {
       toast.error(error.message);
-      setErrorMessage(error.message)
     } finally {
       setLoading(false);
     }
@@ -125,10 +122,10 @@ export default function Auth() {
                 {(() => {
                   switch (pathname) {
                     case AuthPaths.SIGNUP:
-                      return <Signup loading={loading} handleSignup={handleSignup} error={errorMessage} />;
+                      return <Signup loading={loading} handleSignup={handleSignup} />;
 
                     case AuthPaths.LOGIN:
-                      return <Login loading={loading} handleLogin={handleLogin} error={errorMessage} />;
+                      return <Login loading={loading} handleLogin={handleLogin} />;
 
                     case AuthPaths.FORGOT_PASSWORD:
                       return <ForgotPassword />;
