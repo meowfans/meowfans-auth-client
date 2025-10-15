@@ -22,7 +22,6 @@ const emptyInput = {
 
 const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
   const [input, setInput] = useState<LoginInput>(emptyInput);
-  const [disabled, setDisabled] = useState<boolean>(false);
   const [initialInput, setInitialInput] = useState<LoginInput>(emptyInput);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
@@ -31,10 +30,6 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
     setInput((prev) => ({ ...prev, [key]: value.trim() }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
-
-  // useEffect(() => {
-  //   setDisabled(!isValidEmail(input.email) || !isValidPassword(input.password));
-  // }, [input]);
 
   const validate = (): boolean => {
     const newErrors: typeof errors = {};
@@ -47,6 +42,9 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
   return (
     <form
       className="p-6 md:p-8 flex flex-col gap-6"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.preventDefault();
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         if (validate()) handleLogin(e, input);
@@ -80,7 +78,7 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
         {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
       </div>
 
-      <Button disabled={disabled || loading} type="submit" className="w-full z-50">
+      <Button disabled={loading} type="submit" className="w-full z-50">
         {loading && <Loader2Icon className="animate-spin mr-2" />}
         Login
       </Button>

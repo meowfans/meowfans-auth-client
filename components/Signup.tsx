@@ -8,7 +8,7 @@ import { SignupInput } from '@/lib/constants';
 import { isValidEmail, isValidPassword } from '@/util/helpers';
 import { Loader2Icon } from 'lucide-react';
 import Link from 'next/link';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Header } from './Header';
 
 interface Props {
@@ -24,7 +24,6 @@ const emptyInput: SignupInput = {
 
 const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
   const [input, setInput] = useState<SignupInput>(emptyInput);
-  const [disabled, setDisabled] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
   const [initialInput, setInitialInput] = useState<SignupInput>(emptyInput);
   const [errors, setErrors] = useState<Partial<Record<keyof SignupInput, string>>>({});
@@ -34,10 +33,6 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
     setInput((prev) => ({ ...prev, [key]: value.trim() }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
-
-  useEffect(() => {
-    setDisabled(!input.fullName || !input.email || !input.password || !isValidEmail(input.email) || !isValidPassword(input.password));
-  }, [input]);
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof SignupInput, string>> = {};
@@ -51,6 +46,9 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
   return (
     <form
       className="p-6 md:p-8 flex flex-col"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.preventDefault();
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         if (validate()) handleSignup(e, input);
@@ -110,7 +108,7 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
             {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
           </div>
 
-          <Button type="submit" className="w-full" disabled={disabled || loading}>
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2Icon className="animate-spin mr-2" />}
             Signup
           </Button>
