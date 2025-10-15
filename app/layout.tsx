@@ -59,6 +59,7 @@ export const verifyAccessToken = async (token?: string) => {
     fetchMethod: FetchMethods.POST,
     pathName: '/auth/verify',
     init: {
+      credentials: 'include',
       body: JSON.stringify({ token }),
       headers: {
         'Content-Type': 'application/json'
