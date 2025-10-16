@@ -1,111 +1,105 @@
-import { AgeConfirmation } from '@/app/(legal)/components/AgeConfirmation';
-import { CookieBanner } from '@/app/(legal)/components/CookieBanner';
-import { AppBottomNav } from '@/components/AppBottomNav';
-import { AppSidebar } from '@/components/AppSideBar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { Toaster } from '@/components/ui/sonner';
-import { UserContextWrapper } from '@/hooks/context/UserContextWrapper';
 import { fetchRequest } from '@/hooks/useAPI';
 import { AppConfig } from '@/lib/app.config';
-import { authCookieKey, FetchMethods, UserRoles } from '@/lib/constants';
+import { authCookieKey, FetchMethods, JwtUser, UserRoles } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import { getClient } from '@/packages/gql/ApolloClient';
-import { ApolloWrapper } from '@/packages/gql/ApolloWrapper';
-import { GET_FAN_PROFILE_QUERY } from '@/packages/gql/api/fanAPI';
-import { FanProfilesEntity } from '@/packages/gql/generated/graphql';
 import { configService } from '@/util/config';
-import { buildSafeUrl, decodeJwtToken } from '@/util/helpers';
+import { buildSafeUrl } from '@/util/helpers';
 import { Theme } from '@radix-ui/themes';
 import type { Metadata, Viewport } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Inter } from 'next/font/google';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { Toaster } from 'sonner';
 import './globals.css';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const headerList = headers();
-  const pathname = (await headerList).get('x-pathname') ?? '';
+export async function generateMetadata() {
+  const headersList = headers();
+  const pathname = (await headersList).get('x-pathname');
 
-  return {
+  const metadata = {
     metadataBase: new URL(AppConfig.siteUrl),
     title: {
       template: AppConfig.template,
-      default: `${AppConfig.title} | ${pathname.substring(1) || 'Home'}`
+      default: `${AppConfig.title} | ${pathname?.substring(1)}`
     },
-    description: AppConfig.description,
-    keywords: AppConfig.keywords,
-    openGraph: {
-      siteName: AppConfig.site_name,
-      title: `${AppConfig.title} | 18+`,
-      description: AppConfig.subDescription,
-      type: 'website',
-      locale: AppConfig.locale,
-      url: AppConfig.siteUrl,
-      images: AppConfig.images
+    alternates: {
+      canonical: AppConfig.canonical
     },
-    alternates: { canonical: AppConfig.canonical },
     manifest: AppConfig.manifest,
     applicationName: AppConfig.applicationName,
+    description: AppConfig.description,
+    openGraph: {
+      siteName: AppConfig.site_name,
+      title: AppConfig.title,
+      description: AppConfig.description,
+      type: AppConfig.type as 'website',
+      locale: AppConfig.locale,
+      url: AppConfig.siteUrl
+    },
     generator: 'Next.js',
-    icons: AppConfig.icons
-  };
+    keywords: AppConfig.keywords,
+    icons: [
+      { rel: 'apple-touch-icon', url: '/icons/logo_256.png' },
+      { rel: 'icon', url: '/icons/logo_256.png' }
+    ]
+  } satisfies Metadata;
+  return metadata;
 }
 
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--primary-font',
+  style: 'normal'
+});
 export const viewport: Viewport = {
-  themeColor: AppConfig.themeColor
+  themeColor: '#FFFFFF'
 };
 
-const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--primary-font' });
-
-const verifyAccessToken = async (token: string) => {
-  return fetchRequest({
+export const verifyAccessToken = async (token?: string) => {
+  const data = await fetchRequest({
     fetchMethod: FetchMethods.POST,
     pathName: '/auth/verify',
     init: {
-      body: JSON.stringify({ token }),
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' }
+      body: JSON.stringify({ token }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     }
   });
+  return data as JwtUser;
 };
 
-const getStatus = async () => {
+export const handleValidateAndRedirect = async () => {
   try {
-    const client = await getClient();
-    const { data } = await client.query({ query: GET_FAN_PROFILE_QUERY });
-    return data?.getFanProfile as FanProfilesEntity;
+    const cookiesList = await cookies();
+    const accessToken = cookiesList.get(authCookieKey)?.value;
+    const jwtUser = await verifyAccessToken(accessToken);
+    if (jwtUser) return await redirectToApp(jwtUser);
   } catch {
-    return null;
+    return;
   }
 };
 
-const handleValidateAuth = async () => {
-  const cookiesList = await cookies();
-  const accessToken = cookiesList.get(authCookieKey)?.value;
-  const decodedToken = decodeJwtToken(accessToken);
-
-  if (!accessToken || !decodedToken) return null;
-
-  try {
-    await verifyAccessToken(accessToken);
-
-    switch (decodedToken.roles?.[0]) {
-      case UserRoles.ADMIN:
-        return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_ADMIN_URL }));
-      case UserRoles.CREATOR:
-        return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_CREATOR_URL }));
-    }
-
-    return await getStatus();
-  } catch {
-    return null;
+export const redirectToApp = async (jwtUser: JwtUser) => {
+  switch (jwtUser.roles[0]) {
+    case UserRoles.CREATOR:
+      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_CREATOR_URL, pathname: '/profile' }));
+    case UserRoles.FAN:
+      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_FAN_URL, pathname: '/trending' }));
+    case UserRoles.ADMIN:
+      return redirect(buildSafeUrl({ host: configService.NEXT_PUBLIC_ADMIN_URL, pathname: '/vaults' }));
   }
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await handleValidateAuth();
+interface Props {
+  children: React.ReactNode;
+}
 
+export default async function RootLayout({ children }: Props) {
+  await handleValidateAndRedirect();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -117,24 +111,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="apple-touch-icon" href="/icons/logo_512.png" />
       </head>
       <body className={cn(inter.variable, 'overscroll-none')}>
-        <ApolloWrapper>
-          <UserContextWrapper user={user}>
-            <Theme>
-              <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-                <AgeConfirmation />
-                <SidebarProvider>
-                  <AppSidebar />
-                  <SidebarInset>
-                    <Toaster position="top-center" richColors />
-                    <main className="w-full">{children}</main>
-                  </SidebarInset>
-                </SidebarProvider>
-                <AppBottomNav />
-                <CookieBanner />
-              </ThemeProvider>
-            </Theme>
-          </UserContextWrapper>
-        </ApolloWrapper>
+        <Toaster position="top-center" richColors />
+        <Theme>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            value={{ light: 'light', dark: 'dark' }}
+          >
+            <main className="w-full">{children}</main>
+          </ThemeProvider>
+        </Theme>
       </body>
     </html>
   );
