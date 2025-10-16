@@ -13,9 +13,9 @@ import { redirect } from 'next/navigation';
 import { Toaster } from 'sonner';
 import './globals.css';
 
-export async function generateMetadata() {
-  const headersList = headers();
-  const pathname = (await headersList).get('x-pathname');
+export async function generateMetadata(): Promise<Metadata> {
+  const headerList = headers();
+  const pathname = (await headerList).get('x-pathname') ?? '';
 
   const metadata = {
     metadataBase: new URL(AppConfig.siteUrl),
@@ -39,7 +39,10 @@ export async function generateMetadata() {
     },
     generator: 'Next.js',
     keywords: AppConfig.keywords,
-    icons: AppConfig.icons
+    icons: [
+      { rel: 'apple-touch-icon', url: '/icons/logo_256.png' },
+      { rel: 'icon', url: '/icons/logo_256.png' }
+    ]
   } satisfies Metadata;
   return metadata;
 }
