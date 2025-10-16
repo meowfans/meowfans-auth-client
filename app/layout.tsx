@@ -106,6 +106,7 @@ export default async function RootLayout({ children }: Props) {
         <meta name="classification" content="Adult" />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/icons/logo_192.png" />
+        <link rel="icon" href="/icons/32.png" />
         <link rel="apple-touch-icon" href="/icons/logo_512.png" />
       </head>
       <body className={cn(inter.variable, 'overscroll-none')}>

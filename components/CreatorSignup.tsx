@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreatorSignupInput } from '@/lib/constants';
 import { isValidEmail, isValidPassword } from '@/util/helpers';
 import Link from 'next/link';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Header } from './Header';
 
 interface Props {
@@ -27,22 +27,22 @@ const CreatorSignup: React.FC<Props> = ({ handleCreatorSignUp, loading }) => {
   const [activeTab, setActiveTab] = useState<string>('account');
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [initialInput, setInitialInput] = useState<CreatorSignupInput>(emptyInput);
+  const [errors, setErrors] = useState<Partial<Record<keyof CreatorSignupInput, string>>>({});
 
   const handleChangeInput = ({ key, value }: { key: keyof CreatorSignupInput; value: string }) => {
     setInitialInput((prev) => ({ ...prev, [key]: value }));
     setInput((prev) => ({ ...prev, [key]: value.trim() }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  useEffect(() => {
-    setIsDisabled(
-      !input.email ||
-        !input.fullName ||
-        !input.password ||
-        !input.username ||
-        !isValidEmail(input.email) ||
-        !isValidPassword(input.password)
-    );
-  }, [input.email, input.fullName, input.password, input.username]);
+  const validate = (): boolean => {
+    const newErrors: Partial<Record<keyof CreatorSignupInput, string>> = {};
+    if (!input.fullName) newErrors.fullName = 'Full name is required';
+    if (!isValidEmail(input.email)) newErrors.email = 'Invalid email format';
+    if (!isValidPassword(input.password)) newErrors.password = 'Password must be at least 6 characters';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   return (
     <form
@@ -63,27 +63,33 @@ const CreatorSignup: React.FC<Props> = ({ handleCreatorSignUp, loading }) => {
 
           <TabsContent value="account" className="space-y-1">
             <div className="grid gap-3">
-              <Label htmlFor="creator-fullname">Full name</Label>
+              <Label htmlFor="fullName">Full name</Label>
               <Input
-                id="creator-fullname"
-                placeholder="Meow User"
+                id="fullName"
                 type="text"
+                required
+                placeholder="Meow User"
                 value={initialInput.fullName}
                 onChange={(e) => handleChangeInput({ key: 'fullName', value: e.target.value })}
+                className={errors.fullName ? 'border-red-500 focus-visible:ring-red-500' : ''}
               />
+              {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
             </div>
+
             <div className="grid gap-3">
-              <Label htmlFor="creator-email">Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="creator-email"
-                placeholder="meow@fans.com"
+                id="email"
                 type="email"
                 required
-                autoComplete="email"
+                placeholder="meow@gmail.com"
                 value={initialInput.email}
                 onChange={(e) => handleChangeInput({ key: 'email', value: e.target.value })}
+                className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
               />
+              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
+
             <Button type="button" className="w-full mt-7" onClick={() => setActiveTab('password')}>
               Next
             </Button>
@@ -95,23 +101,29 @@ const CreatorSignup: React.FC<Props> = ({ handleCreatorSignUp, loading }) => {
               <Input
                 id="creator-username"
                 type="text"
-                placeholder="@meowfan"
+                placeholder="@username"
                 autoComplete="username"
                 value={initialInput.username}
                 required
                 onChange={(e) => handleChangeInput({ key: 'username', value: e.target.value })}
               />
             </div>
+
             <div className="grid gap-3">
-              <Label htmlFor="creator-password">Password</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
-                id="creator-password"
+                id="password"
                 type="password"
-                autoComplete="password"
+                placeholder="password"
+                required
+                autoComplete="current-password"
                 value={initialInput.password}
                 onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
+                className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
               />
+              {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
             </div>
+
             <Button type="submit" className="w-full z-50" disabled={isDisabled}>
               Signup
             </Button>

@@ -70,6 +70,7 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
               type="text"
               placeholder="Meow User"
               value={initialInput.fullName}
+              required
               onChange={(e) => handleChangeInput({ key: 'fullName', value: e.target.value })}
               className={errors.fullName ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
@@ -83,6 +84,7 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
               type="email"
               placeholder="meow@gmail.com"
               value={initialInput.email}
+              required
               onChange={(e) => handleChangeInput({ key: 'email', value: e.target.value })}
               className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
@@ -101,6 +103,7 @@ const SignupForm: React.FC<Props> = ({ handleSignup, loading }) => {
               id="password"
               type="password"
               placeholder="password"
+              required
               value={initialInput.password}
               onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
               className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}

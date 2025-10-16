@@ -102,7 +102,7 @@ export default function Auth() {
       toast.success('Logged in');
       return router.push(creatorAppUrl);
     } catch (error) {
-      toast.error('Something wrong happened!');
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
