@@ -41,7 +41,7 @@ export default function Auth() {
 
       const fanAppUrl = buildSafeUrl({
         host: configService.NEXT_PUBLIC_FAN_URL,
-        pathname: '/newest'
+        pathname: '/trending'
       });
 
       const adminAppUrl = buildSafeUrl({

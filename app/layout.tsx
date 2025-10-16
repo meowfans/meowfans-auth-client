@@ -98,15 +98,12 @@ export default async function RootLayout({ children }: Props) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="rating" content="adult" />
         <meta name="robots" content="index, follow" />
-        <meta name="classification" content="Adult" />
         <meta name="rating" content="RTA-5042-1996-1400-1577-RTA" />
+        <meta name="classification" content="Adult" />
         <link rel="manifest" href="/site.webmanifest" />
-        <link rel="icon" href="/icons/app_icon_20x20.svg" />
-        {AppConfig.icons.map(({ rel, url }, idx) => (
-          <link key={idx} rel={rel} href={url} />
-        ))}
+        <link rel="icon" href="/icons/logo_192.png" />
+        <link rel="apple-touch-icon" href="/icons/logo_512.png" />
       </head>
       <body className={cn(inter.variable, 'overscroll-none')}>
         <Toaster position="top-center" richColors />

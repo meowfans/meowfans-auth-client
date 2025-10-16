@@ -1,67 +1,17 @@
 {
-  "name": "Meow",
-  "description": "Become a meow member",
-  "short_name": "Meow",
+  "name": "MeowFans",
+  "description": "Become a meowfans member",
+  "short_name": "MeowFans",
   "start_url": "/",
   "background_color": "#FFFFFF",
   "theme_color": "#FFFFFF",
   "display": "standalone",
   "icons": [
-    {
-      "src": "/icons/app_icon_36x36.svg",
-      "sizes": "36x36",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_48x48.svg",
-      "sizes": "48x48",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_72x72.svg",
-      "sizes": "72x72",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_96x96.svg",
-      "sizes": "96x96",
-      "type": "image/svg"
-    },
-
-    {
-      "src": "/icons/app_icon_144x144.svg",
-      "sizes": "144x144",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_196x196.svg",
-      "sizes": "196x196",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_256x256.svg",
-      "sizes": "256x256",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_384x384.svg",
-      "sizes": "384x384",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_460x460.svg",
-      "sizes": "460x460",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_512x512.svg",
-      "sizes": "512x512",
-      "type": "image/svg"
-    },
-    {
-      "src": "/icons/app_icon_1024x1024.svg",
-      "sizes": "1024x1024",
-      "type": "image/svg"
-    }
+    { "src": "/icons/logo_192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/logo_256.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "/icons/logo_384.png", "sizes": "384x384", "type": "image/png" },
+    { "src": "/icons/logo_460.png", "sizes": "460x460", "type": "image/png" },
+    { "src": "/icons/logo_512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/logo_1024.png", "sizes": "1024x1024", "type": "image/png" }
   ]
 }
