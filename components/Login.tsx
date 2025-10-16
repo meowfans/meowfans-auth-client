@@ -71,6 +71,7 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
           id="password"
           type="password"
           placeholder="******"
+          autoComplete="current-password"
           value={initialInput.password}
           onChange={(e) => handleChangeInput({ key: 'password', value: e.target.value })}
           className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
