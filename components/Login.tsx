@@ -57,6 +57,7 @@ const LoginForm: React.FC<Props> = ({ handleLogin, loading }) => {
         <Input
           id="email"
           type="email"
+          autoComplete="email"
           placeholder="m@example.com"
           value={initialInput.email}
           onChange={(e) => handleChangeInput({ key: 'email', value: e.target.value })}
