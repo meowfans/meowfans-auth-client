@@ -25,7 +25,7 @@ const useAPI = () => {
       domain: configService.NEXT_PUBLIC_APP_DOMAINS,
       sameSite: 'none',
       secure: true,
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
     });
   };
 
